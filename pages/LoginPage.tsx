@@ -34,56 +34,56 @@ const LoginPage: React.FC = () => {
             <div className="bg-blue-600 p-3 rounded-xl mb-3">
               <CalendarScheduleIcon />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">SmartSchedule AI</h1>
-            <p className="text-gray-500">Sign in to your account</p>
+            <h1 className="text-3xl font-bold text-gray-800">SmartSchedule AI</h1>
+            <p className="text-gray-500 text-md">Sign in to your account</p>
           </div>
 
           <div className="bg-gray-200/80 p-1 rounded-xl flex items-center mb-6">
-            <button onClick={() => setRole('admin')} className={`w-1/2 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${role === 'admin' ? activeTabClass : inactiveTabClass}`}>
+            <button onClick={() => setRole('admin')} className={`w-1/2 py-2 rounded-lg font-semibold transition-all duration-300 ${role === 'admin' ? activeTabClass : inactiveTabClass}`}>
               Admin
             </button>
-            <button onClick={() => setRole('teacher')} className={`w-1/2 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${role === 'teacher' ? activeTabClass : inactiveTabClass}`}>
+            <button onClick={() => setRole('teacher')} className={`w-1/2 py-2 rounded-lg font-semibold transition-all duration-300 ${role === 'teacher' ? activeTabClass : inactiveTabClass}`}>
               Teacher
             </button>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{role === 'admin' ? 'Admin Login' : 'Teacher Login'}</h3>
-            <p className="text-sm text-gray-500 -mt-3">{role === 'admin' ? 'Access the administrative dashboard' : 'View your personalized schedule'}</p>
+            <h3 className="text-xl font-semibold text-gray-900">{role === 'admin' ? 'Admin Login' : 'Teacher Login'}</h3>
+            <p className="text-base text-gray-500 -mt-3">{role === 'admin' ? 'Access the administrative dashboard' : 'View your personalized schedule'}</p>
             
             <div>
-              <label className="text-sm font-medium text-gray-700">Email</label>
+              <label className="text-base font-medium text-gray-700">Email</label>
               <input
                 type="email"
                 placeholder={role === 'admin' ? 'admin@college.edu' : 'teacher@college.edu'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Password</label>
+              <label className="text-base font-medium text-gray-700">Password</label>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
               />
             </div>
 
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
             
-            <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity shadow-md">
+            <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity shadow-md text-base">
               Sign In as {role === 'admin' ? 'Admin' : 'Teacher'}
             </button>
           </form>
 
           {role === 'teacher' && (
-            <p className="text-center mt-6 text-sm text-gray-600">
+            <p className="text-center mt-6 text-base text-gray-600">
               Don't have an account?{' '}
               <button onClick={() => setAppView('register')} className="font-semibold text-blue-600 hover:underline">
                 Register here

@@ -118,7 +118,7 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
                 <ChevronLeftIcon />
                 <span className="ml-1">Back to Dashboard</span>
             </button>
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Generate New Timetable</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-6">Generate New Timetable</h1>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Select label="Department" value={department} onChange={e => setDepartment(e.target.value)}>
@@ -132,7 +132,7 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
                          {Object.keys(semestersForYear).map(s => <option key={s} value={s}>{s}</option>)}
                     </Select>
                     <div className="md:col-span-2">
-                        <h3 className="block text-sm font-medium text-gray-700 mb-2">Select Subjects</h3>
+                        <h3 className="block text-base font-medium text-gray-700 mb-2">Select Subjects</h3>
                         <div className="p-3 bg-gray-50 border rounded-md max-h-60 overflow-y-auto">
                             {subjects.length > 0 ? subjects.map(s => {
                                 const teacherExists = teachers.some(t => t.name === s.defaultTeacher);
@@ -146,7 +146,7 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
                                             className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
                                             disabled={!teacherExists}
                                         />
-                                        <label htmlFor={`sub-${s.code}`} className={`ml-2 block text-sm ${!teacherExists && 'text-gray-400'}`}>
+                                        <label htmlFor={`sub-${s.code}`} className={`ml-2 block text-base ${!teacherExists && 'text-gray-400'}`}>
                                             {s.name} - 
                                             <span className={teacherExists ? 'text-gray-500' : 'text-red-500 font-semibold'}>
                                                 {teacherExists ? ` ${s.defaultTeacher}` : ' [Unassigned - Teacher not registered]'}

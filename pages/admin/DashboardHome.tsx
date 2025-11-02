@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAppContext } from '../../contexts/AppContext';
@@ -17,7 +18,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
         </div>
         <div>
             <p className="text-3xl font-bold text-gray-800">{value}</p>
-            <p className="text-sm text-gray-500">{title}</p>
+            <p className="text-base text-gray-500">{title}</p>
         </div>
     </div>
 );
@@ -62,8 +63,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ setView }) => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p className="text-gray-500 mt-1">Manage schedules, teachers, and analytics</p>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Admin Dashboard</h1>
+                    <p className="text-gray-500 mt-1 text-lg">Manage schedules, teachers, and analytics</p>
                 </div>
                 <div className="flex items-center space-x-3">
                     <Button variant="secondary" onClick={() => setView('classes')}>
@@ -86,8 +87,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ setView }) => {
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-1 text-gray-700">Weekly Lecture Distribution</h2>
-                    <p className="text-sm text-gray-500 mb-4">Number of lectures scheduled per day</p>
+                    <h2 className="text-2xl font-semibold mb-1 text-gray-700">Weekly Lecture Distribution</h2>
+                    <p className="text-base text-gray-500 mb-4">Number of lectures scheduled per day</p>
                     <div style={{ width: '100%', height: 300 }}>
                         <ResponsiveContainer>
                             <BarChart data={weeklyData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
@@ -102,14 +103,14 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ setView }) => {
                 </div>
 
                 <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-1 text-gray-700">Today's Schedule</h2>
-                    <p className="text-sm text-gray-500 mb-4">Upcoming lectures for today</p>
+                    <h2 className="text-2xl font-semibold mb-1 text-gray-700">Today's Schedule</h2>
+                    <p className="text-base text-gray-500 mb-4">Upcoming lectures for today</p>
                     <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                         {todaysSchedule.length > 0 ? todaysSchedule.map((lecture, index) => (
                             <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                                <p className="font-bold text-xs text-purple-600">{lecture.time.split(' - ')[0]}</p>
-                                <p className="text-gray-800 font-semibold text-sm">{lecture.subject}</p>
-                                <p className="text-xs text-gray-500">{lecture.teacher} {lecture.room && lecture.room !== "N/A" && `• ${lecture.room}`}</p>
+                                <p className="font-bold text-sm text-purple-600">{lecture.time.split(' - ')[0]}</p>
+                                <p className="text-gray-800 font-semibold text-base">{lecture.subject}</p>
+                                <p className="text-sm text-gray-500">{lecture.teacher} {lecture.room && lecture.room !== "N/A" && `• ${lecture.room}`}</p>
                             </div>
                         )) : (
                           <div className="flex items-center justify-center h-full pt-16">

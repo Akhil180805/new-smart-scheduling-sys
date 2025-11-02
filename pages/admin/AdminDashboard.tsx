@@ -47,8 +47,8 @@ const AdminDashboard: React.FC = () => {
                                 <CalendarScheduleIcon />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-gray-800">SmartSchedule AI</h1>
-                                <p className="text-xs text-gray-500">Admin Portal</p>
+                                <h1 className="text-xl font-bold text-gray-800">SmartSchedule AI</h1>
+                                <p className="text-sm text-gray-500">Admin Portal</p>
                             </div>
                         </div>
 

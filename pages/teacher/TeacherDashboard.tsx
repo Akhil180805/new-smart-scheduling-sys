@@ -64,7 +64,7 @@ const TeacherDashboard: React.FC = () => {
 
     const todaysSchedule = activeTeacherTimetables.flatMap(tt => tt.schedule.filter(d => d.day === todayDayStr));
 
-    const weeklyDayButtons = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weeklyDayButtons = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
     const handleDownloadToday = () => {
         const header = `Today's Schedule for ${teacherUser.name}\nDate: ${new Date().toLocaleDateString()}\n\n`;
@@ -90,8 +90,8 @@ const TeacherDashboard: React.FC = () => {
                     <div>
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Full Schedule</h1>
-                                <p className="text-gray-500 mt-1">All your assigned timetables, past, present, and future.</p>
+                                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Full Schedule</h1>
+                                <p className="text-gray-500 mt-1 text-lg">All your assigned timetables, past, present, and future.</p>
                             </div>
                             <Button variant="secondary" onClick={() => setActiveView('dashboard')}>
                                 <ChevronLeftIcon /> <span className="ml-2 hidden sm:inline">Back to Dashboard</span>
@@ -102,14 +102,14 @@ const TeacherDashboard: React.FC = () => {
                                 <div key={timetable.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
                                         <div>
-                                            <h2 className="text-xl font-bold text-gray-800">{timetable.year} - {timetable.semester}</h2>
-                                            <p className="text-sm text-gray-500">{timetable.department} ({timetable.startDate} to {timetable.endDate})</p>
+                                            <h2 className="text-2xl font-bold text-gray-800">{timetable.year} - {timetable.semester}</h2>
+                                            <p className="text-base text-gray-500">{timetable.department} ({timetable.startDate} to {timetable.endDate})</p>
                                         </div>
-                                         <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full mt-2 sm:mt-0">{timetable.schedule.reduce((acc, d) => acc + d.lectures.length, 0)} Lectures</span>
+                                         <span className="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full mt-2 sm:mt-0">{timetable.schedule.reduce((acc, d) => acc + d.lectures.length, 0)} Lectures</span>
                                     </div>
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-sm text-left">
-                                            <thead className="text-xs text-gray-700 uppercase bg-gray-50/50">
+                                        <table className="w-full text-base text-left">
+                                            <thead className="text-sm text-gray-700 uppercase bg-gray-50/50">
                                                 <tr>
                                                     <th className="px-4 py-2 font-semibold">Day</th>
                                                     <th className="px-4 py-2 font-semibold">Time</th>
@@ -146,8 +146,8 @@ const TeacherDashboard: React.FC = () => {
                     <div>
                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Profile</h1>
-                                <p className="text-gray-500 mt-1">Manage your personal information and preferences.</p>
+                                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Profile</h1>
+                                <p className="text-gray-500 mt-1 text-lg">Manage your personal information and preferences.</p>
                             </div>
                             {!isEditingProfile && <Button onClick={() => setIsEditingProfile(true)} className="w-full sm:w-auto">Edit Profile</Button>}
                         </div>
@@ -183,23 +183,23 @@ const TeacherDashboard: React.FC = () => {
                                         {initials}
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 w-full">
-                                        <div><p className="text-sm text-gray-500">Full Name</p><p>{teacherUser.name}</p></div>
-                                        <div><p className="text-sm text-gray-500">Qualification</p><p>{teacherUser.qualification}</p></div>
-                                        <div><p className="text-sm text-gray-500">Email Address</p><p>{teacherUser.email}</p></div>
-                                        <div><p className="text-sm text-gray-500">Phone Number</p><p>{teacherUser.phoneNumber}</p></div>
-                                        <div><p className="text-sm text-gray-500">Department</p><p>{teacherUser.department}</p></div>
-                                        <div><p className="text-sm text-gray-500">Official Location</p><p>{teacherUser.location}</p></div>
-                                        <div className="sm:col-span-2"><p className="text-sm text-gray-500">Subjects Teaching</p>
+                                        <div><p className="text-base text-gray-500">Full Name</p><p className="text-lg">{teacherUser.name}</p></div>
+                                        <div><p className="text-base text-gray-500">Qualification</p><p className="text-lg">{teacherUser.qualification}</p></div>
+                                        <div><p className="text-base text-gray-500">Email Address</p><p className="text-lg">{teacherUser.email}</p></div>
+                                        <div><p className="text-base text-gray-500">Phone Number</p><p className="text-lg">{teacherUser.phoneNumber}</p></div>
+                                        <div><p className="text-base text-gray-500">Department</p><p className="text-lg">{teacherUser.department}</p></div>
+                                        <div><p className="text-base text-gray-500">Official Location</p><p className="text-lg">{teacherUser.location}</p></div>
+                                        <div className="sm:col-span-2"><p className="text-base text-gray-500">Subjects Teaching</p>
                                             <div className="flex flex-wrap gap-2 mt-1">
-                                                {(Array.isArray(teacherUser.subjects) && teacherUser.subjects.length > 0) ? teacherUser.subjects.map(s => <span key={s} className="bg-cyan-100 text-cyan-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{s}</span>) : <p>N/A</p>}
+                                                {(Array.isArray(teacherUser.subjects) && teacherUser.subjects.length > 0) ? teacherUser.subjects.map(s => <span key={s} className="bg-cyan-100 text-cyan-800 text-sm font-medium px-2.5 py-0.5 rounded-full">{s}</span>) : <p>N/A</p>}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 pt-6 border-t">
-                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-2xl font-bold text-indigo-600">{teacherUser.experience}</p><p className="text-sm text-gray-500">Teaching Experience</p></div>
-                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-2xl font-bold text-indigo-600">{teacherUser.department}</p><p className="text-sm text-gray-500">Member Of</p></div>
-                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-2xl font-bold text-indigo-600">{teacherTimetables.length}</p><p className="text-sm text-gray-500">Active Schedules</p></div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-3xl font-bold text-indigo-600">{teacherUser.experience}</p><p className="text-base text-gray-500">Teaching Experience</p></div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-3xl font-bold text-indigo-600">{teacherUser.department}</p><p className="text-base text-gray-500">Member Of</p></div>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-center"><p className="text-3xl font-bold text-indigo-600">{teacherTimetables.length}</p><p className="text-base text-gray-500">Active Schedules</p></div>
                                 </div>
                                 </>
                             )}
@@ -217,8 +217,8 @@ const TeacherDashboard: React.FC = () => {
                                     {initialsDash}
                                 </div>
                                 <div className="text-center sm:text-left">
-                                    <h1 className="text-2xl font-bold text-gray-900">Prof. {teacherUser.name.split(' ').slice(1).join(' ')}</h1>
-                                    <p className="text-gray-500">{teacherUser.email}</p>
+                                    <h1 className="text-3xl font-bold text-gray-900">Prof. {teacherUser.name.split(' ').slice(1).join(' ')}</h1>
+                                    <p className="text-gray-500 text-base">{teacherUser.email}</p>
                                 </div>
                                 <div className="flex items-center space-x-3 mt-4 sm:mt-0 sm:ml-auto">
                                     <Button variant="secondary" size="sm" onClick={handleDownloadToday}><DownloadIcon className="h-4 w-4" /><span className="ml-2">Download Today's Schedule</span></Button>
@@ -227,22 +227,22 @@ const TeacherDashboard: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-purple-100 text-purple-600 p-3 rounded-lg mr-4"><ClockIcon /></div><div><p className="text-3xl font-bold">{todaysSchedule.reduce((acc, day) => acc + day.lectures.length, 0)}</p><p className="text-sm text-gray-500">Today's Lectures</p></div></div>
-                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-cyan-100 text-cyan-600 p-3 rounded-lg mr-4"><CalendarIcon /></div><div><p className="text-3xl font-bold">{lecturesThisWeek}</p><p className="text-sm text-gray-500">This Week</p></div></div>
-                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-indigo-100 text-indigo-600 p-3 rounded-lg mr-4"><CollectionIcon /></div><div><p className="text-3xl font-bold">{totalLecturesAllTime}</p><p className="text-sm text-gray-500">Total Classes</p></div></div>
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-purple-100 text-purple-600 p-3 rounded-lg mr-4"><ClockIcon /></div><div><p className="text-3xl font-bold">{todaysSchedule.reduce((acc, day) => acc + day.lectures.length, 0)}</p><p className="text-base text-gray-500">Today's Lectures</p></div></div>
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-cyan-100 text-cyan-600 p-3 rounded-lg mr-4"><CalendarIcon /></div><div><p className="text-3xl font-bold">{lecturesThisWeek}</p><p className="text-base text-gray-500">This Week</p></div></div>
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center"><div className="bg-indigo-100 text-indigo-600 p-3 rounded-lg mr-4"><CollectionIcon /></div><div><p className="text-3xl font-bold">{totalLecturesAllTime}</p><p className="text-base text-gray-500">Total Classes</p></div></div>
                         </div>
                         
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                                <h2 className="text-xl font-semibold mb-4 text-gray-700">Today's Schedule</h2>
+                                <h2 className="text-2xl font-semibold mb-4 text-gray-700">Today's Schedule</h2>
                                 <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
                                     {todaysSchedule.length > 0 ? todaysSchedule.map((day, i) => (
                                         <div key={i}>
                                             {day.lectures.map((lecture, j) => (
                                                 <div key={j} className="p-4 bg-gray-50 border-l-4 border-purple-400 rounded-r-md mb-2">
-                                                    <p className="font-bold text-sm text-purple-600">{lecture.time}</p>
-                                                    <p className="text-gray-800 font-medium">{lecture.subject}</p>
-                                                    {lecture.room && lecture.room !== "N/A" && <p className="text-xs text-gray-500 mt-1">Room: {lecture.room}</p>}
+                                                    <p className="font-bold text-base text-purple-600">{lecture.time}</p>
+                                                    <p className="text-gray-800 font-medium text-lg">{lecture.subject}</p>
+                                                    {lecture.room && lecture.room !== "N/A" && <p className="text-sm text-gray-500 mt-1">Room: {lecture.room}</p>}
                                                 </div>
                                             ))}
                                         </div>
@@ -250,15 +250,15 @@ const TeacherDashboard: React.FC = () => {
                                 </div>
                             </div>
                              <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                                <h2 className="text-xl font-semibold mb-4 text-gray-700">Weekly Overview</h2>
-                                <p className="text-sm text-gray-500 mb-4">Your schedule for this week.</p>
+                                <h2 className="text-2xl font-semibold mb-4 text-gray-700">Weekly Overview</h2>
+                                <p className="text-base text-gray-500 mb-4">Your schedule for this week.</p>
                                 <div className="space-y-2">
                                     {weeklyDayButtons.map(day => {
                                         const lectures = activeTeacherTimetables.flatMap(tt => tt.schedule.filter(d => d.day === day).flatMap(d => d.lectures)).length;
                                         return (
                                             <div key={day} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                <span className="font-medium text-gray-700">{day}</span>
-                                                <span className={`font-bold ${lectures > 0 ? 'text-blue-600' : 'text-gray-400'}`}>{lectures} {lectures === 1 ? 'Lecture' : 'Lectures'}</span>
+                                                <span className="font-medium text-gray-700 text-base">{day}</span>
+                                                <span className={`font-bold text-base ${lectures > 0 ? 'text-blue-600' : 'text-gray-400'}`}>{lectures} {lectures === 1 ? 'Lecture' : 'Lectures'}</span>
                                             </div>
                                         );
                                     })}
@@ -287,8 +287,8 @@ const TeacherDashboard: React.FC = () => {
                                 <CalendarScheduleIcon />
                             </div>
                              <div>
-                                <h1 className="text-lg font-bold text-gray-800">SmartSchedule AI</h1>
-                                <p className="text-xs text-gray-500">Teacher Portal</p>
+                                <h1 className="text-xl font-bold text-gray-800">SmartSchedule AI</h1>
+                                <p className="text-sm text-gray-500">Teacher Portal</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">

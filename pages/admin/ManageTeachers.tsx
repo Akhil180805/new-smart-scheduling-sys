@@ -21,8 +21,8 @@ const ManageTeachers: React.FC<ManageTeachersProps> = ({ setView }) => {
 
   const ProfileDetail: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
     <div>
-      <p className="text-sm font-medium text-gray-500">{label}</p>
-      <p className="mt-1 text-md text-gray-900">{value || 'N/A'}</p>
+      <p className="text-base font-medium text-gray-500">{label}</p>
+      <p className="mt-1 text-lg text-gray-900">{value || 'N/A'}</p>
     </div>
   );
 
@@ -34,8 +34,8 @@ const ManageTeachers: React.FC<ManageTeachersProps> = ({ setView }) => {
               <span className="ml-1">All Teachers</span>
             </button>
             <div className="border-b border-gray-200 pb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Teacher Profile</h1>
-                <p className="text-gray-500 mt-1">Full details for {selectedTeacher.name}.</p>
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Teacher Profile</h1>
+                <p className="text-gray-500 mt-1 text-lg">Full details for {selectedTeacher.name}.</p>
             </div>
             <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                 <ProfileDetail label="Full Name" value={selectedTeacher.name} />
@@ -60,12 +60,12 @@ const ManageTeachers: React.FC<ManageTeachersProps> = ({ setView }) => {
           <span className="ml-1">Back to Dashboard</span>
         </button>
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Manage Teachers</h1>
-        <p className="text-gray-500 mt-1">View, inspect, or remove teacher profiles.</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Manage Teachers</h1>
+        <p className="text-gray-500 mt-1 text-lg">View, inspect, or remove teacher profiles.</p>
       </div>
       <div className="overflow-x-auto mt-6">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+        <table className="w-full text-base text-left text-gray-500">
+          <thead className="text-sm text-gray-700 uppercase bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 font-semibold">Name</th>
               <th scope="col" className="px-6 py-3 font-semibold">Email</th>

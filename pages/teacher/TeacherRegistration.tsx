@@ -97,12 +97,12 @@ const TeacherRegistration: React.FC = () => {
                 <div className="bg-blue-600 p-3 rounded-xl mb-3">
                   <CalendarScheduleIcon />
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800">Teacher Registration</h1>
-                <p className="text-gray-500">Create your account</p>
+                <h1 className="text-3xl font-bold text-gray-800">Teacher Registration</h1>
+                <p className="text-gray-500 text-md">Create your account</p>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Register as Teacher</h3>
-            <p className="text-sm text-gray-500 mb-6">Fill in your details to create an account</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-1">Register as Teacher</h3>
+            <p className="text-base text-gray-500 mb-6">Fill in your details to create an account</p>
 
             <form onSubmit={handleRegister} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,7 +125,7 @@ const TeacherRegistration: React.FC = () => {
                 </div>
 
                 <div className="pt-2">
-                    <h3 className="block text-sm font-medium text-gray-700 mb-2">Subjects Taught *</h3>
+                    <h3 className="block text-base font-medium text-gray-700 mb-2">Subjects Taught *</h3>
                      <div className="p-3 bg-gray-50 border rounded-md max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {availableSubjects.length > 0 ? availableSubjects.map(subject => (
                             <div key={subject.code} className="flex items-center">
@@ -136,7 +136,7 @@ const TeacherRegistration: React.FC = () => {
                                     onChange={() => handleSubjectChange(subject.name)}
                                     className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
-                                <label htmlFor={`sub-${subject.code}`} className="ml-2 block text-sm text-gray-900">{subject.name}</label>
+                                <label htmlFor={`sub-${subject.code}`} className="ml-2 block text-base text-gray-900">{subject.name}</label>
                             </div>
                         )) : <p className="text-gray-500 text-sm">Select a department and year to see subjects.</p>}
                     </div>
@@ -145,7 +145,7 @@ const TeacherRegistration: React.FC = () => {
               {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
               
               <div className="pt-4">
-                <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity shadow-md">
+                <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity shadow-md text-base">
                   Register
                 </button>
               </div>

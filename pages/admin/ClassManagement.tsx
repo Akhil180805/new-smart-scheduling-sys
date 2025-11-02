@@ -73,8 +73,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
             </button>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Manage Schedules</h1>
-                    <p className="text-gray-500 mt-1">Configure classes, sections, and timings</p>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Manage Schedules</h1>
+                    <p className="text-gray-500 mt-1 text-lg">Configure classes, sections, and timings</p>
                 </div>
                 <Button onClick={() => setView('generate')} className="flex items-center justify-center">
                     <PlusIcon /> <span className="ml-2">Generate New Schedule</span>
@@ -86,7 +86,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
                 <input 
                     type="text" 
                     placeholder="Search schedules by department, year, or semester..." 
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
@@ -97,14 +97,14 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
                     <div className="bg-cyan-100 text-cyan-600 p-3 rounded-lg mr-4"><BookOpenIcon /></div>
                     <div>
                         <p className="text-3xl font-bold">{timetables.length}</p>
-                        <p className="text-sm text-gray-500">Total Schedules</p>
+                        <p className="text-base text-gray-500">Total Schedules</p>
                     </div>
                 </div>
                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center">
                     <div className="bg-indigo-100 text-indigo-600 p-3 rounded-lg mr-4"><UsersIcon /></div>
                     <div>
                         <p className="text-3xl font-bold">{totalLectures}</p>
-                        <p className="text-sm text-gray-500">Total Lectures</p>
+                        <p className="text-base text-gray-500">Total Lectures</p>
                     </div>
                 </div>
                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center">
@@ -118,11 +118,11 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
                     <div key={timetable.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
                             <div>
-                                <h2 className="text-xl font-bold text-gray-800">{timetable.year} - {timetable.semester}</h2>
-                                <p className="text-sm text-gray-500">{timetable.department} ({timetable.startDate} to {timetable.endDate})</p>
+                                <h2 className="text-2xl font-bold text-gray-800">{timetable.year} - {timetable.semester}</h2>
+                                <p className="text-base text-gray-500">{timetable.department} ({timetable.startDate} to {timetable.endDate})</p>
                             </div>
                             <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                                <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{timetable.schedule.reduce((acc, d) => acc + d.lectures.length, 0)} Lectures</span>
+                                <span className="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{timetable.schedule.reduce((acc, d) => acc + d.lectures.length, 0)} Lectures</span>
                                 <button 
                                     onClick={() => handleDelete(timetable.id, `${timetable.year} - ${timetable.semester}`)}
                                     className="text-gray-400 hover:text-red-600 p-1 rounded-full transition-colors"
@@ -133,8 +133,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
                             </div>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50/50">
+                            <table className="w-full text-base text-left">
+                                <thead className="text-sm text-gray-700 uppercase bg-gray-50/50">
                                     <tr>
                                         <th className="px-4 py-2 font-semibold">Day</th>
                                         <th className="px-4 py-2 font-semibold">Time</th>
