@@ -46,3 +46,32 @@ export interface Timetable {
   endDate: string;
   schedule: DaySchedule[];
 }
+
+export interface Notification {
+  id: string;
+  userId: string; // ID of the user (teacher) to receive the notification
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface MockEmail {
+  recipientName: string;
+  recipientEmail: string;
+  recipientPhone: string;
+  subject: string;
+  message: string;
+  scheduleContent?: {
+    day: string;
+    lecture: Lecture;
+  };
+}
+
+export interface MockBulkEmailSummary {
+    recipients: {
+        name: string;
+        email: string;
+    }[];
+    subject: string;
+    emailBodyPreview: string;
+}

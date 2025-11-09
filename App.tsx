@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import TeacherRegistration from './pages/teacher/TeacherRegistration';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
+import MockMailbox from './components/common/MockMailbox';
 
 const App: React.FC = () => {
   const { appView, user } = useAppContext();
@@ -35,6 +36,7 @@ const App: React.FC = () => {
       <main className="flex-grow">
         {renderContent()}
       </main>
+      <MockMailbox />
     </div>
   );
 };

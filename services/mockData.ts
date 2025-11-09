@@ -33,6 +33,13 @@ export const MOCK_TEACHERS: Teacher[] = [
   { id: 't114', name: 'Reena Ostwal', email: 'reena.ostwal@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Networks'], phoneNumber: '234-555-6666', age: 45, location: 'Pune, IN', qualification: 'Ph.D. in CSE', experience: '17 Years', department: 'Information Technology', yearSpecialization: 'Second Year' },
   { id: 't115', name: 'Madhuri Gedam', email: 'madhuri.gedam@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Unix'], phoneNumber: '234-666-7777', age: 49, location: 'Mumbai, IN', qualification: 'M.Tech IT', experience: '19 Years', department: 'Information Technology', yearSpecialization: 'Second Year' },
   { id: 't116', name: 'Akhil Varma', email: 'akhilkumar.k.varma@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Workshop Lab'], phoneNumber: '234-777-8888', age: 35, location: 'Mumbai, IN', qualification: 'B.E. Mechanical', experience: '7 Years', department: 'Information Technology', yearSpecialization: 'First Year' },
+  // New Teachers for 4th Year
+  { id: 't117', name: 'Rupali Pashte', email: 'rupali.pashte@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['AI and DS-II'], phoneNumber: '345-111-2222', age: 42, location: 'Mumbai, IN', qualification: 'M.E. IT', experience: '14 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
+  { id: 't118', name: 'Reena Kothari', email: 'reena.kothari@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Internet OF Everything'], phoneNumber: '345-222-3333', age: 40, location: 'Pune, IN', qualification: 'M.Tech CSE', experience: '12 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
+  { id: 't119', name: 'Dr. Varsha Kiranpure', email: 'varsha.kiranpure@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Software Testing And QA'], phoneNumber: '345-333-4444', age: 48, location: 'Mumbai, IN', qualification: 'Ph.D. in CSE', experience: '18 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
+  { id: 't120', name: 'Amruta Sankhe', email: 'amruta.sankhe@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Information Retrieval System'], phoneNumber: '345-444-5555', age: 39, location: 'Pune, IN', qualification: 'M.Tech IT', experience: '11 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
+  { id: 't121', name: 'Natasha Naik', email: 'natasha.naik@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['Cyber Security And Laws'], phoneNumber: '345-555-6666', age: 43, location: 'Mumbai, IN', qualification: 'M.E. IT', experience: '15 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
+  { id: 't122', name: 'Prachii Shrivastav', email: 'prachii.shrivastav@slrtce.in', password: 'teacher123', role: 'teacher', subjects: ['ROSP Lab'], phoneNumber: '345-666-7777', age: 38, location: 'Pune, IN', qualification: 'M.Tech CSE', experience: '10 Years', department: 'Information Technology', yearSpecialization: 'Fourth Year' },
 ];
 
 export const MOCK_SUBJECTS_BY_DEPT: { [key: string]: { [key: string]: { [key: string]: Subject[] } } } = {
@@ -121,10 +128,15 @@ export const MOCK_SUBJECTS_BY_DEPT: { [key: string]: { [key: string]: { [key: st
     },
     'Fourth Year': {
         'Semester 7': [
-            { name: 'Cloud Computing', code: 'CS701', defaultTeacher: 'Dr. Tim Berners-Lee' },
-            { name: 'Big Data Analytics', code: 'CS702', defaultTeacher: 'Dr. Donald Knuth' },
-            { name: 'Elective-I: Blockchain Technology', code: 'CSE711', defaultTeacher: 'Dr. Alan Turing' },
-            { name: 'Elective-II: Internet of Things', code: 'CSE712', defaultTeacher: 'Reena Ostwal' }
+            { name: 'AI and DS-II', code: 'ITC701', defaultTeacher: 'Rupali Pashte' },
+            { name: 'Internet OF Everything', code: 'ITC702', defaultTeacher: 'Reena Kothari' },
+            { name: 'Software Testing And QA', code: 'ITDO7014', defaultTeacher: 'Dr. Varsha Kiranpure' },
+            { name: 'Information Retrieval System', code: 'ITDO7024', defaultTeacher: 'Amruta Sankhe' },
+            { name: 'Cyber Security And Laws', code: 'ILO7016', defaultTeacher: 'Natasha Naik' },
+            { name: 'Data Science Lab', code: 'ITL701', defaultTeacher: 'Rupali Pashte' },
+            { name: 'IOE Lab', code: 'ITL702', defaultTeacher: 'Reena Kothari' },
+            { name: 'SAD Lab', code: 'ITL703', defaultTeacher: 'Natasha Naik' },
+            { name: 'ROSP Lab', code: 'ITL704', defaultTeacher: 'Prachii Shrivastav' },
         ],
         'Semester 8': [
             { name: 'Project Work', code: 'PR801', defaultTeacher: 'Manthan Joshi' },

@@ -1,11 +1,13 @@
 
 
+
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAppContext } from '../../contexts/AppContext';
 import { UsersGroupIcon, BookOpenIcon, ClockIcon, CalendarDaysIcon, ViewGridIcon, PlusIcon } from '../../components/icons/Icons';
 import Button from '../../components/common/Button';
 import { Lecture } from '../../types';
+import { getTodayInfo } from '../../utils/dateUtils';
 
 interface DashboardHomeProps {
     setView: (view: 'dashboard' | 'generate' | 'teachers' | 'classes') => void;
@@ -23,19 +25,10 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
     </div>
 );
 
-const getTodayDateString = () => {
-    const today = new Date();
-    // Adjust for timezone offset to get local date as YYYY-MM-DD
-    const offset = today.getTimezoneOffset();
-    const todayWithOffset = new Date(today.getTime() - (offset * 60 * 1000));
-    return todayWithOffset.toISOString().split('T')[0];
-};
-
 const DashboardHome: React.FC<DashboardHomeProps> = ({ setView }) => {
     const { timetables, teachers } = useAppContext();
 
-    const todayString = getTodayDateString();
-    const todayDayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const { dateString: todayString, dayString: todayDayStr } = getTodayInfo();
 
     const activeSchedulesCount = timetables.filter(tt => 
         todayString >= tt.startDate && todayString <= tt.endDate

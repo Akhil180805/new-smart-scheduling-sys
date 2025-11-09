@@ -1,17 +1,41 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import DashboardHome from './DashboardHome';
 import GenerateTimetable from './GenerateTimetable';
 import ManageTeachers from './ManageTeachers';
 import ClassManagement from './ClassManagement';
-import { CalendarScheduleIcon, LogoutIcon } from '../../components/icons/Icons';
+import { CalendarScheduleIcon, LogoutIcon, BellIcon, BellAlertIcon, UserPlusIcon, CalendarDaysIcon } from '../../components/icons/Icons';
+import { formatTimeAgo } from '../../utils/dateUtils';
+
 
 type AdminView = 'dashboard' | 'generate' | 'teachers' | 'classes';
 
 const AdminDashboard: React.FC = () => {
-    const { logout } = useAppContext();
-    const [view, setView] = useState<AdminView>('dashboard');
+    const { user, logout, notifications, markNotificationAsRead, markAllNotificationsAsRead } = useAppContext();
+    const [view, setView] = useState<AdminView>(() => {
+        const savedView = sessionStorage.getItem('smartschedule-admin-view');
+        return (savedView as AdminView) || 'dashboard';
+    });
+    const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+    const notificationPanelRef = useRef<HTMLDivElement>(null);
+    
+    const adminNotifications = notifications.filter(n => n.userId === user?.id);
+    const unreadCount = adminNotifications.filter(n => !n.read).length;
+
+    useEffect(() => {
+        sessionStorage.setItem('smartschedule-admin-view', view);
+    }, [view]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (notificationPanelRef.current && !notificationPanelRef.current.contains(event.target as Node)) {
+                setIsNotificationPanelOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
 
     const renderView = () => {
         switch (view) {
@@ -36,6 +60,13 @@ const AdminDashboard: React.FC = () => {
         </button>
     );
 
+    const getNotificationIcon = (message: string) => {
+        if (message.includes('registered')) {
+            return <UserPlusIcon className="h-6 w-6 text-green-500" />;
+        }
+        return <CalendarDaysIcon className="h-6 w-6 text-blue-500" />;
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
              {/* Header */}
@@ -58,10 +89,46 @@ const AdminDashboard: React.FC = () => {
                             <NavButton label="Manage Schedules" currentView={view} targetView="classes" />
                         </nav>
 
-                        <button onClick={logout} className="flex items-center text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
-                            <LogoutIcon />
-                            <span className="ml-2 hidden sm:inline">Logout</span>
-                        </button>
+                        <div className="flex items-center space-x-2">
+                             <div className="relative">
+                                <button onClick={() => setIsNotificationPanelOpen(prev => !prev)} className="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                                    {unreadCount > 0 ? <BellAlertIcon /> : <BellIcon />}
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-white text-xs items-center justify-center">{unreadCount}</span>
+                                        </span>
+                                    )}
+                                </button>
+                                {isNotificationPanelOpen && (
+                                    <div ref={notificationPanelRef} className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-2xl border z-50">
+                                        <div className="p-3 flex items-center justify-between border-b">
+                                            <h3 className="font-semibold text-lg text-gray-800">Admin Notifications</h3>
+                                            {unreadCount > 0 && user && <button onClick={() => markAllNotificationsAsRead(user.id)} className="text-sm text-blue-600 hover:underline">Mark all as read</button>}
+                                        </div>
+                                        <div className="max-h-96 overflow-y-auto">
+                                            {adminNotifications.length > 0 ? adminNotifications.map(n => (
+                                                <div key={n.id} onClick={() => !n.read && markNotificationAsRead(n.id)} className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${!n.read ? 'bg-blue-50' : ''}`}>
+                                                    <div className="flex items-start">
+                                                        <div className="mr-3 shrink-0 mt-1">{getNotificationIcon(n.message)}</div>
+                                                        <div className="flex-1">
+                                                          <p className="text-sm text-gray-700">{n.message}</p>
+                                                          <p className="text-xs text-gray-400 mt-1">{formatTimeAgo(n.timestamp)}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )) : (
+                                                <p className="text-center text-gray-500 py-10">You have no notifications.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <button onClick={logout} className="flex items-center text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
+                                <LogoutIcon />
+                                <span className="ml-2 hidden sm:inline">Logout</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>

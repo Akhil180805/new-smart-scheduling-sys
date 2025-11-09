@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, Teacher, Timetable } from '../types';
+import { User, Teacher, Timetable, Notification, MockEmail, MockBulkEmailSummary } from '../types';
 import { MOCK_TEACHERS, MOCK_TIMETABLES } from '../services/mockData';
 
 type AppView = 'landing' | 'login' | 'register' | 'adminDashboard' | 'teacherDashboard';
@@ -18,6 +18,16 @@ interface AppContextType {
   addTimetable: (timetable: Timetable) => void;
   updateTimetable: (updatedTimetable: Timetable) => void;
   deleteTimetable: (timetableId: string) => void;
+  notifications: Notification[];
+  addNotification: (userId: string, message: string) => void;
+  markNotificationAsRead: (notificationId: string) => void;
+  markAllNotificationsAsRead: (userId: string) => void;
+  mockEmail: MockEmail | null;
+  showMockEmail: (email: MockEmail) => void;
+  hideMockEmail: () => void;
+  mockBulkEmailSummary: MockBulkEmailSummary | null;
+  showMockBulkEmailSummary: (summary: MockBulkEmailSummary) => void;
+  hideMockBulkEmailSummary: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,6 +55,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return savedTimetables ? JSON.parse(savedTimetables) : MOCK_TIMETABLES;
   });
 
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    const savedNotifications = localStorage.getItem('smartschedule-notifications');
+    return savedNotifications ? JSON.parse(savedNotifications) : [];
+  });
+  
+  const [mockEmail, setMockEmail] = useState<MockEmail | null>(null);
+  const [mockBulkEmailSummary, setMockBulkEmailSummary] = useState<MockBulkEmailSummary | null>(null);
+
   useEffect(() => {
     if (user) {
         localStorage.setItem('smartschedule-user', JSON.stringify(user));
@@ -61,10 +79,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('smartschedule-timetables', JSON.stringify(timetables));
   }, [timetables]);
 
+  useEffect(() => {
+    localStorage.setItem('smartschedule-notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
 
   const login = (role: 'admin' | 'teacher', email: string, pass: string): boolean => {
     if (role === 'admin' && email.toLowerCase() === 'admin@slrtce.in' && pass === 'admin123') {
-      const adminUser: User = { id: 'admin01', name: 'Admin', email: 'admin@slrtce.in', role: 'admin' };
+      const adminUser: User = { id: 'admin', name: 'Admin', email: 'admin@slrtce.in', role: 'admin' };
       setUser(adminUser);
       setAppView('adminDashboard');
       return true;
@@ -96,6 +118,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       age: undefined, // Age is not collected in the new form
     };
     setTeachers(prev => [...prev, newTeacher]);
+    addNotification('admin', `${newTeacher.name} has registered as a new teacher.`);
   };
 
   const deleteTeacher = (teacherId: string) => {
@@ -139,9 +162,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTimetables(prev => prev.filter(t => t.id !== timetableId));
   };
 
+  const addNotification = (userId: string, message: string) => {
+    const newNotification: Notification = {
+      id: `notif-${Date.now()}-${Math.random()}`,
+      userId,
+      message,
+      timestamp: new Date().toISOString(),
+      read: false,
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const markNotificationAsRead = (notificationId: string) => {
+    setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
+  };
+
+  const markAllNotificationsAsRead = (userId: string) => {
+    setNotifications(prev => prev.map(n => (n.userId === userId && !n.read) ? { ...n, read: true } : n));
+  };
+
+  const showMockEmail = (email: MockEmail) => setMockEmail(email);
+  const hideMockEmail = () => setMockEmail(null);
+  const showMockBulkEmailSummary = (summary: MockBulkEmailSummary) => setMockBulkEmailSummary(summary);
+  const hideMockBulkEmailSummary = () => setMockBulkEmailSummary(null);
 
   return (
-    <AppContext.Provider value={{ appView, setAppView, user, login, logout, teachers, registerTeacher, deleteTeacher, updateTeacherProfile, timetables, addTimetable, updateTimetable, deleteTimetable }}>
+    <AppContext.Provider value={{ 
+      appView, setAppView, user, login, logout, teachers, registerTeacher, deleteTeacher, updateTeacherProfile, 
+      timetables, addTimetable, updateTimetable, deleteTimetable,
+      notifications, addNotification, markNotificationAsRead, markAllNotificationsAsRead,
+      mockEmail, showMockEmail, hideMockEmail,
+      mockBulkEmailSummary, showMockBulkEmailSummary, hideMockBulkEmailSummary
+    }}>
       {children}
     </AppContext.Provider>
   );

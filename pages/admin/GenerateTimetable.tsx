@@ -1,21 +1,50 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { MOCK_SUBJECTS_BY_DEPT, DEPARTMENTS } from '../../services/mockData';
 import { generateTimetableAI } from '../../services/geminiService';
+import { sendBulkNotificationsForGeneration } from '../../services/notificationService';
 import Button from '../../components/common/Button';
 import Select from '../../components/common/Select';
 import Input from '../../components/common/Input';
 import { Timetable, Subject, Teacher } from '../../types';
-import { ChevronLeftIcon, SpinnerIcon } from '../../components/icons/Icons';
+import { ChevronLeftIcon, SpinnerIcon, ErrorIcon, ExclamationTriangleIcon } from '../../components/icons/Icons';
+import { getTodayInfo } from '../../utils/dateUtils';
+
+/**
+ * Checks for conflicts in the parameters provided for timetable generation.
+ * @param subjects - The list of subjects selected for the timetable.
+ * @param teachers - The full list of registered teachers.
+ * @returns An array of string messages describing any conflicts found.
+ */
+const checkGenerationConflicts = (
+    subjects: Subject[],
+    teachers: Teacher[]
+): string[] => {
+    const conflicts: string[] = [];
+    const registeredTeacherNames = new Set(teachers.map(t => t.name));
+
+    if (subjects.length === 0) {
+        conflicts.push("No subjects selected. Please choose at least one subject to generate a schedule.");
+    }
+
+    subjects.forEach(subject => {
+        if (!registeredTeacherNames.has(subject.defaultTeacher)) {
+            conflicts.push(
+                `Teacher "${subject.defaultTeacher}" for subject "${subject.name}" is not registered.`
+            );
+        }
+    });
+
+    return conflicts;
+};
+
 
 interface GenerateTimetableProps {
     setView: (view: 'dashboard' | 'generate' | 'teachers' | 'classes') => void;
 }
 
 const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
-    const { teachers, addTimetable } = useAppContext();
+    const { teachers, addTimetable, addNotification, showMockBulkEmailSummary } = useAppContext();
     const [department, setDepartment] = useState(DEPARTMENTS[0]);
     const [year, setYear] = useState('First Year');
     const [semester, setSemester] = useState('Semester 1');
@@ -24,13 +53,24 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
     const [lectureDuration, setLectureDuration] = useState(45);
     const [labDuration, setLabDuration] = useState(120);
     const [breakDuration, setBreakDuration] = useState(60);
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 4); // Default to a 1 week schedule (Mon-Fri)
-    const [endDate, setEndDate] = useState(tomorrow.toISOString().split('T')[0]);
+
+    const getInitialEndDate = (start: string) => {
+        const parts = start.split('-').map(Number);
+        const startDateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+        startDateObj.setDate(startDateObj.getDate() + 4);
+        const year = startDateObj.getFullYear();
+        const month = String(startDateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(startDateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const todayDateString = getTodayInfo().dateString;
+    const [startDate, setStartDate] = useState(todayDateString);
+    const [endDate, setEndDate] = useState(() => getInitialEndDate(todayDateString));
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [conflicts, setConflicts] = useState<string[]>([]);
     
     const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
 
@@ -40,20 +80,15 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
     const subjects = semestersForYear[semester] || [];
 
     useEffect(() => {
-        // Reset selections when department/year/semester changes
         const currentYears = Object.keys(subjectsForDept);
         if(currentYears.length > 0 && !currentYears.includes(year)) {
             const firstYear = currentYears[0];
             setYear(firstYear);
             const currentSemesters = Object.keys(subjectsForDept[firstYear] || {});
-            if (currentSemesters.length > 0) {
-                 setSemester(currentSemesters[0]);
-            }
+            if (currentSemesters.length > 0) setSemester(currentSemesters[0]);
         } else {
              const currentSemesters = Object.keys(subjectsForDept[year] || {});
-             if(currentSemesters.length > 0 && !currentSemesters.includes(semester)) {
-                setSemester(currentSemesters[0]);
-             }
+             if(currentSemesters.length > 0 && !currentSemesters.includes(semester)) setSemester(currentSemesters[0]);
         }
         setSelectedSubjects([]);
     }, [department, year, semester]);
@@ -70,15 +105,17 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
+        setConflicts([]);
 
-        const uniqueTeacherNames = [...new Set(selectedSubjects.map(s => s.defaultTeacher))];
-        const selectedTeachers = teachers.filter(t => uniqueTeacherNames.includes(t.name));
-
-        if (selectedSubjects.length === 0 || selectedTeachers.length === 0) {
-            setError('Please select at least one subject. Ensure teachers for selected subjects are registered.');
+        const conflictMessages = checkGenerationConflicts(selectedSubjects, teachers);
+        if (conflictMessages.length > 0) {
+            setConflicts(conflictMessages);
             setIsLoading(false);
             return;
         }
+
+        const uniqueTeacherNames = [...new Set(selectedSubjects.map(s => s.defaultTeacher))];
+        const selectedTeachers = teachers.filter(t => uniqueTeacherNames.includes(t.name));
 
         try {
             const result = await generateTimetableAI({
@@ -96,7 +133,7 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
             };
             
             addTimetable(newTimetable);
-            alert('Timetable generated successfully!');
+            sendBulkNotificationsForGeneration(newTimetable, teachers, addNotification, showMockBulkEmailSummary);
             setView('classes');
         } catch (err: any) {
             setError(err.message || 'An unexpected error occurred.');
@@ -111,7 +148,7 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col justify-center items-center z-10 rounded-lg">
                     <SpinnerIcon className="w-12 h-12 animate-spin text-blue-600" />
                     <p className="mt-4 text-lg font-semibold text-gray-700">Generating Schedule...</p>
-                    <p className="text-gray-500">The AI is working. This may take a moment.</p>
+                    <p className="text-gray-500">The local generator is working. This may take a moment.</p>
                 </div>
             )}
             <button onClick={() => setView('dashboard')} className="flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4">
@@ -168,12 +205,48 @@ const GenerateTimetable: React.FC<GenerateTimetableProps> = ({ setView }) => {
                     
                     <Input label="Start Date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
                     <Input label="End Date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-
                 </div>
-                {error && <p className="text-red-500 mt-4 text-center font-medium">{error}</p>}
+
+                {conflicts.length > 0 && (
+                    <div className="mt-6 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-base font-semibold text-yellow-800">Conflict Report</h3>
+                                <div className="mt-2 text-sm text-yellow-700">
+                                    <p>The following issues must be resolved before a schedule can be generated:</p>
+                                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                                        {conflicts.map((conflict, index) => (
+                                            <li key={index}>{conflict}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {error && (
+                  <div className="mt-6 p-4 bg-red-50 border border-red-300 rounded-lg">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <ErrorIcon className="h-5 w-5 text-red-500" />
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-base font-semibold text-red-800">Timetable Generation Failed</h3>
+                        <div className="mt-2 text-sm text-red-700">
+                          <p>{error}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-8 text-right">
                     <Button type="submit" disabled={isLoading}>
-                        {isLoading ? 'Generating...' : 'Generate Timetable'}
+                        {isLoading ? 'Processing...' : 'Generate Timetable'}
                     </Button>
                 </div>
             </form>

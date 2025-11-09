@@ -1,31 +1,47 @@
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CalendarIcon, ClockIcon, CollectionIcon, UserIcon, LogoutIcon, CalendarScheduleIcon, DownloadIcon, BookOpenIcon, ChartBarIcon, ChevronLeftIcon } from '../../components/icons/Icons';
+import { CalendarIcon, ClockIcon, CollectionIcon, UserIcon, LogoutIcon, CalendarScheduleIcon, DownloadIcon, BookOpenIcon, ChartBarIcon, ChevronLeftIcon, BellIcon, BellAlertIcon, ArchiveBoxIcon } from '../../components/icons/Icons';
 import Button from '../../components/common/Button';
 import { Teacher, Timetable } from '../../types';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import { DEPARTMENTS } from '../../services/mockData';
+import { formatTimeAgo, getTodayInfo } from '../../utils/dateUtils';
 
-
-const getTodayDateString = () => {
-    const today = new Date();
-    // Adjust for timezone offset to get local date as YYYY-MM-DD
-    const offset = today.getTimezoneOffset();
-    const todayWithOffset = new Date(today.getTime() - (offset * 60 * 1000));
-    return todayWithOffset.toISOString().split('T')[0];
-};
+type TeacherView = 'dashboard' | 'profile' | 'schedules' | 'pastSchedules';
 
 const TeacherDashboard: React.FC = () => {
-    const { user, timetables, logout, updateTeacherProfile } = useAppContext();
-    const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'schedules'>('dashboard');
+    const { user, timetables, logout, updateTeacherProfile, notifications, markNotificationAsRead, markAllNotificationsAsRead } = useAppContext();
+    const [activeView, setActiveView] = useState<TeacherView>(() => {
+        const savedView = sessionStorage.getItem('smartschedule-teacher-view');
+        return (savedView as TeacherView) || 'dashboard';
+    });
     const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+    const notificationPanelRef = useRef<HTMLDivElement>(null);
     
     const teacherUser = user as Teacher;
     const [editableProfile, setEditableProfile] = useState<Teacher | null>(teacherUser);
+    
+    const teacherNotifications = notifications.filter(n => n.userId === teacherUser.id);
+    const unreadCount = teacherNotifications.filter(n => !n.read).length;
+
+    useEffect(() => {
+        sessionStorage.setItem('smartschedule-teacher-view', activeView);
+    }, [activeView]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (notificationPanelRef.current && !notificationPanelRef.current.contains(event.target as Node)) {
+                setIsNotificationPanelOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
     
     if (!teacherUser || !editableProfile) return null;
     
@@ -41,6 +57,8 @@ const TeacherDashboard: React.FC = () => {
         }
     };
 
+    const { dateString: todayString, dayString: todayDayStr } = getTodayInfo();
+
     const teacherTimetables = timetables.map(tt => ({
         ...tt,
         schedule: tt.schedule.map(day => ({
@@ -49,8 +67,13 @@ const TeacherDashboard: React.FC = () => {
         })).filter(day => day.lectures.length > 0)
     })).filter(tt => tt.schedule.length > 0);
 
-    const todayString = getTodayDateString();
-    const todayDayStr = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const pastTimetables = teacherTimetables
+        .filter(tt => tt.endDate < todayString)
+        .sort((a, b) => b.startDate.localeCompare(a.startDate));
+
+    const activeOrFutureTimetables = teacherTimetables
+        .filter(tt => tt.endDate >= todayString)
+        .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
     const activeTeacherTimetables = teacherTimetables.filter(tt => 
         todayString >= tt.startDate && todayString <= tt.endDate
@@ -91,14 +114,14 @@ const TeacherDashboard: React.FC = () => {
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Full Schedule</h1>
-                                <p className="text-gray-500 mt-1 text-lg">All your assigned timetables, past, present, and future.</p>
+                                <p className="text-gray-500 mt-1 text-lg">Your upcoming and currently active timetables.</p>
                             </div>
                             <Button variant="secondary" onClick={() => setActiveView('dashboard')}>
                                 <ChevronLeftIcon /> <span className="ml-2 hidden sm:inline">Back to Dashboard</span>
                             </Button>
                         </div>
                         <div className="space-y-6">
-                            {teacherTimetables.length > 0 ? teacherTimetables.map(timetable => (
+                            {activeOrFutureTimetables.length > 0 ? activeOrFutureTimetables.map(timetable => (
                                 <div key={timetable.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
                                         <div>
@@ -134,7 +157,54 @@ const TeacherDashboard: React.FC = () => {
                                 </div>
                             )) : (
                                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-10 text-center">
-                                    <p className="text-gray-500">You have not been assigned to any schedules yet.</p>
+                                    <p className="text-gray-500">You have not been assigned to any upcoming schedules yet.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+             case 'pastSchedules':
+                return (
+                    <div>
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Past Schedules</h1>
+                                <p className="text-gray-500 mt-1 text-lg">A historical archive of your completed weekly schedules.</p>
+                            </div>
+                            <Button variant="secondary" onClick={() => setActiveView('dashboard')}>
+                                <ChevronLeftIcon /> <span className="ml-2 hidden sm:inline">Back to Dashboard</span>
+                            </Button>
+                        </div>
+                        <div className="space-y-6">
+                            {pastTimetables.length > 0 ? pastTimetables.map(timetable => {
+                                const totalLectures = timetable.schedule.reduce((acc, d) => acc + d.lectures.length, 0);
+                                return (
+                                    <div key={timetable.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-gray-800">{timetable.year} - {timetable.semester}</h2>
+                                                <p className="text-base text-gray-500">{timetable.department} ({timetable.startDate} to {timetable.endDate})</p>
+                                            </div>
+                                            <span className="text-base font-semibold bg-gray-100 text-gray-700 px-4 py-2 rounded-lg mt-2 sm:mt-0">
+                                                Total Lectures: {totalLectures}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 pt-4 border-t">
+                                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(dayName => {
+                                                const dayLectures = timetable.schedule.find(d => d.day === dayName)?.lectures.length || 0;
+                                                return (
+                                                    <div key={dayName} className="p-3 bg-gray-50 rounded-lg text-center">
+                                                        <p className="font-medium text-gray-700 text-base">{dayName}</p>
+                                                        <p className={`font-bold text-2xl mt-1 ${dayLectures > 0 ? 'text-indigo-600' : 'text-gray-400'}`}>{dayLectures}</p>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                )
+                            }) : (
+                                <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-10 text-center">
+                                    <p className="text-gray-500">You have no completed schedules in your history.</p>
                                 </div>
                             )}
                         </div>
@@ -270,7 +340,7 @@ const TeacherDashboard: React.FC = () => {
         }
     };
     
-    const HeaderButton: React.FC<{label: string, view: 'dashboard' | 'profile' | 'schedules', icon: React.ReactNode}> = ({ label, view, icon }) => (
+    const HeaderButton: React.FC<{label: string, view: TeacherView, icon: React.ReactNode}> = ({ label, view, icon }) => (
          <button onClick={() => setActiveView(view)} className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeView === view ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'}`}>
             {icon}
             <span className="ml-2">{label}</span>
@@ -295,7 +365,42 @@ const TeacherDashboard: React.FC = () => {
                             <div className="hidden sm:flex items-center p-1 bg-gray-100 rounded-lg">
                                 <HeaderButton label="Dashboard" view="dashboard" icon={<ChartBarIcon className="h-4 w-4" />} />
                                 <HeaderButton label="My Full Schedule" view="schedules" icon={<BookOpenIcon className="h-4 w-4" />} />
+                                <HeaderButton label="Past Schedules" view="pastSchedules" icon={<ArchiveBoxIcon className="h-4 w-4" />} />
                                 <HeaderButton label="Profile" view="profile" icon={<UserIcon className="h-4 w-4" />} />
+                            </div>
+                             <div className="relative">
+                                <button onClick={() => setIsNotificationPanelOpen(prev => !prev)} className="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                                    {unreadCount > 0 ? <BellAlertIcon /> : <BellIcon />}
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-5 w-5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-white text-xs items-center justify-center">{unreadCount}</span>
+                                        </span>
+                                    )}
+                                </button>
+                                {isNotificationPanelOpen && (
+                                    <div ref={notificationPanelRef} className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-2xl border z-50">
+                                        <div className="p-3 flex items-center justify-between border-b">
+                                            <h3 className="font-semibold text-lg text-gray-800">Notifications</h3>
+                                            {unreadCount > 0 && <button onClick={() => markAllNotificationsAsRead(teacherUser.id)} className="text-sm text-blue-600 hover:underline">Mark all as read</button>}
+                                        </div>
+                                        <div className="max-h-96 overflow-y-auto">
+                                            {teacherNotifications.length > 0 ? teacherNotifications.map(n => (
+                                                <div key={n.id} onClick={() => !n.read && markNotificationAsRead(n.id)} className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${!n.read ? 'bg-blue-50' : ''}`}>
+                                                    <div className="flex items-start">
+                                                        {!n.read && <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3 shrink-0"></div>}
+                                                        <div className={`flex-1 ${n.read && 'pl-5'}`}>
+                                                          <p className="text-sm text-gray-700">{n.message}</p>
+                                                          <p className="text-xs text-gray-400 mt-1">{formatTimeAgo(n.timestamp)}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )) : (
+                                                <p className="text-center text-gray-500 py-10">You have no notifications.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                              <button onClick={logout} className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors">
                                 <LogoutIcon />
@@ -307,9 +412,10 @@ const TeacherDashboard: React.FC = () => {
             </header>
             <main className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="sm:hidden flex items-center p-1 bg-gray-100 rounded-lg mb-4">
-                    <button onClick={() => setActiveView('dashboard')} className={`w-1/3 py-2 text-sm font-medium rounded-lg ${activeView === 'dashboard' ? 'bg-white shadow' : ''}`}>Dashboard</button>
-                    <button onClick={() => setActiveView('schedules')} className={`w-1/3 py-2 text-sm font-medium rounded-lg ${activeView === 'schedules' ? 'bg-white shadow' : ''}`}>My Full Schedule</button>
-                    <button onClick={() => setActiveView('profile')} className={`w-1/3 py-2 text-sm font-medium rounded-lg ${activeView === 'profile' ? 'bg-white shadow' : ''}`}>Profile</button>
+                    <button onClick={() => setActiveView('dashboard')} className={`w-1/4 py-2 text-sm font-medium rounded-lg ${activeView === 'dashboard' ? 'bg-white shadow' : ''}`}>Dashboard</button>
+                    <button onClick={() => setActiveView('schedules')} className={`w-1/4 py-2 text-sm font-medium rounded-lg ${activeView === 'schedules' ? 'bg-white shadow' : ''}`}>Schedules</button>
+                    <button onClick={() => setActiveView('pastSchedules')} className={`w-1/4 py-2 text-sm font-medium rounded-lg ${activeView === 'pastSchedules' ? 'bg-white shadow' : ''}`}>Past</button>
+                    <button onClick={() => setActiveView('profile')} className={`w-1/4 py-2 text-sm font-medium rounded-lg ${activeView === 'profile' ? 'bg-white shadow' : ''}`}>Profile</button>
                 </div>
                 {renderContent()}
             </main>

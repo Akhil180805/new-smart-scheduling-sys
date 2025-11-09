@@ -1,11 +1,10 @@
-
-
 import React, { useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { Timetable, Lecture } from '../../types';
 import Button from '../../components/common/Button';
 import Select from '../../components/common/Select';
 import { MOCK_SUBJECTS_BY_DEPT } from '../../services/mockData';
+import { sendNotification } from '../../services/notificationService';
 import { ChevronLeftIcon, PlusIcon, SearchIcon, BookOpenIcon, UsersIcon, TrashIcon } from '../../components/icons/Icons';
 
 interface ClassManagementProps {
@@ -13,7 +12,7 @@ interface ClassManagementProps {
 }
 
 const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
-    const { timetables, updateTimetable, teachers, deleteTimetable } = useAppContext();
+    const { timetables, updateTimetable, teachers, deleteTimetable, addNotification, showMockEmail } = useAppContext();
     const [editingTimetable, setEditingTimetable] = useState<Timetable | null>(null);
     const [editingLecture, setEditingLecture] = useState<{ dayIndex: number; lectureIndex: number; lecture: Lecture } | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,8 +23,27 @@ const ClassManagement: React.FC<ClassManagementProps> = ({ setView }) => {
     };
 
     const handleSave = () => {
-        if (editingTimetable) {
+        if (editingTimetable && editingLecture) {
             updateTimetable(editingTimetable);
+
+            const editedLectureInfo = editingTimetable.schedule[editingLecture.dayIndex].lectures[editingLecture.lectureIndex];
+            const day = editingTimetable.schedule[editingLecture.dayIndex].day;
+            const teacher = teachers.find(t => t.name === editedLectureInfo.teacher);
+
+            if (teacher) {
+                const message = `Your schedule was updated: the "${editedLectureInfo.subject}" lecture on ${day} at ${editedLectureInfo.time} has been modified. Please check your dashboard for details.`;
+                sendNotification(
+                    teacher, 
+                    message, 
+                    addNotification, 
+                    showMockEmail,
+                    {
+                        timetableDetails: editingTimetable,
+                        day: day,
+                        lecture: editedLectureInfo
+                    }
+                );
+            }
         }
         setEditingLecture(null);
         setEditingTimetable(null);
